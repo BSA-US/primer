@@ -1,19 +1,11 @@
 # primer
 
-## Project setup
+## Setup
 ```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
+yarn
 ```
 
-### Compiles and minifies for production
+### Run
 ```
-yarn build
+yarn now-remote
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
