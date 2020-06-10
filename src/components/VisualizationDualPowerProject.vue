@@ -1,9 +1,10 @@
 <template lang='pug'>
 .visualization(ref='visualization')
   svg#svg(
+    v-if='simulation'
     pointer-events='all'
     preserveAspectRatio='xMinYMin meet'
-    :viewBox='`0 0 ${settings.svgWidth} ${settings.svgHeight}`'
+    :viewBox='`0 0 ${renderer.width} ${renderer.height}`'
   )
     defs
       marker#triangle(
@@ -19,12 +20,36 @@
           fill='rgba(0,0,0,0.25)'
           transform='rotate(-10)'
         )
+    g.links(fill='none')
+      path.link(
+        v-for='{ id, source, target } in graph.links' :key='id'
+        stroke='rgba(0,0,0,0.25)'
+        stroke-width='1'
+        marker-end='url(#triangle)'
+        :d='linkArc({ source, target })'
+      )
+    g.nodes
+      circle.node(
+        v-for='n in graph.nodes' :key='n.id'
+        r='20'
+        :fill='n.pillars.includes(pillar?.id) ? pillar.color : "white"'
+        stroke='black'
+        stroke-width='1'
+        :cx='n.x'
+        :cy='n.y'
+      )
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import * as d3 from 'd3'
-import { renderLinks, renderNodes } from './'
+import {
+  forceCenter,
+  forceLink,
+  forceManyBody,
+  forceSimulation
+} from 'd3-force'
+import { drag } from 'd3-drag'
+import { event, selectAll } from 'd3-selection'
 
 export default {
   name: 'VisualizationDualPowerProject',
@@ -36,29 +61,26 @@ export default {
   },
   data() {
     return {
+      activeNodeDrags: 0,
       simulation: null,
-      color: d3.scaleOrdinal(d3.schemeCategory10),
-      settings: {
-        strokeColor: '#0022dd',
-        width: 100,
-        svgWidth: 600,
-        svgHeight: 400
+      renderer: {
+        width: 600,
+        height: 400
       }
     }
   },
-  computed: {
-    ...mapGetters(['graph']),
-    nodes() { if (this.graph) return renderNodes(this) },
-    links() { if (this.graph) return renderLinks(this) }
-  },
+  computed: mapGetters(['graph']),
   watch: {
     graph(newGraph, oldGraph) {
-      console.log('graph')
       if (!this.simulation && newGraph !== oldGraph) this.initSimulation()
     },
-    pillar(newPillar, oldPillar) {
-      if (newPillar!==oldPillar) {
-        d3.select('#svg').selectAll('g.nodes').remove()
+    simulation(newSimulation, oldSimulation) {
+      if (newSimulation && !oldSimulation) {
+        selectAll('.node').call(drag()
+          .on('start', this.onNodeDragStarted)
+          .on('drag', this.onNodeDragged)
+          .on('end', this.onNodeDragEnded)
+        )
       }
     }
   },
@@ -66,19 +88,7 @@ export default {
     this.setConstraints()
     window.addEventListener('resize', this.onResized)
 
-    if (module.hot) this.teardownD3()
     if (this.graph) this.initSimulation()
-  },
-  updated() {
-    const { graph, linkArc, links, nodes, pillar } = this
-    if (this.simulation)
-      this.simulation.nodes(graph.nodes).on('tick', () => {
-        links
-          .attr('d', linkArc)
-        nodes
-          .attr('cx', d => d.x)
-          .attr('cy', d => d.y)
-      })
   },
   beforeDestroy() {
     window.removeEventLister('resize', this.onResized)
@@ -87,13 +97,13 @@ export default {
     initSimulation() {
       const {
         graph: { links, nodes },
-        settings: { svgWidth, svgHeight }
+        renderer: { width, height }
       } = this
 
-      this.simulation = d3.forceSimulation(nodes)
-        .force('link', d3.forceLink(links).distance(100).strength(0.1))
-        .force('charge', d3.forceManyBody())
-        .force('center', d3.forceCenter(svgWidth/2, svgHeight/2))
+      this.simulation = forceSimulation(nodes)
+        .force('link', forceLink(links).distance(100).strength(0.1))
+        .force('charge', forceManyBody())
+        .force('center', forceCenter(width/2, height/2))
     },
     linkArc({ target: { x: tx, y: ty }, source: { x: sx, y: sy }}) {
       const r = Math.hypot(tx - sx, ty - sy)
@@ -102,16 +112,26 @@ export default {
         A${r},${r} 0 0,1 ${tx},${ty}
       `
     },
+    onNodeDragStarted() {
+      this.activeNodeDrags += 1
+      if (!this.activeNodeDrags) this.simulation.alphaTarget(0.3).restart()
+    },
+    onNodeDragged(_d, i) {
+      Object.assign(this.graph.nodes[i], { fx: event.x, fy: event.y })
+    },
+    onNodeDragEnded(_d, i) {
+      this.activeNodeDrags -= 1
+      if (!this.activeNodeDrags) this.simulation.alphaTarget(0)
+      Object.assign(this.graph.nodes[i], { fx: null, fy: null })
+    },
     onResized() {
       this.setConstraints()
-      this.teardownD3()
       this.initSimulation()
     },
     setConstraints() {
-      this.settings.svgWidth = this.$refs.visualization.clientWidth
-      this.settings.svgHeight = this.$refs.visualization.clientHeight
+      this.renderer.width = this.$refs.visualization.clientWidth
+      this.renderer.height = this.$refs.visualization.clientHeight
     },
-    teardownD3() { d3.select('#svg').selectAll('g').remove() }
   }
 }
 </script>
