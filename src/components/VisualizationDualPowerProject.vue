@@ -29,23 +29,33 @@
         :d='linkArc({ source, target })'
       )
     g.nodes
-      circle.node(
-        v-for='n in graph.nodes' :key='n.id'
-        r='20'
-        :fill='n.pillars.includes(pillar?.id) ? pillar.color : "white"'
-        stroke='black'
-        stroke-width='1'
-        :cx='n.x'
-        :cy='n.y'
-      )
+      template(v-for='n in graph.nodes' :key='n.id')
+        circle.node(
+          r='60'
+          :fill='n.pillars.includes(pillar?.id) ? pillar.color : "white"'
+          stroke='black'
+          stroke-width='1'
+          :cx='n.x'
+          :cy='n.y'
+        )
+        foreignObject.annotation-container(
+          :x='n.x - 50'
+          :y='n.y - 50'
+          width='100'
+          height='100'
+          pointer-events='none'
+        )
+          p.annotation(v-text='n.name')
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import {
   forceCenter,
+  forceCollide,
   forceLink,
   forceManyBody,
+  forceRadial,
   forceSimulation
 } from 'd3-force'
 import { drag } from 'd3-drag'
@@ -101,9 +111,11 @@ export default {
       } = this
 
       this.simulation = forceSimulation(nodes)
-        .force('link', forceLink(links).distance(100).strength(0.1))
-        .force('charge', forceManyBody())
+        .force('link', forceLink(links).distance(360).strength(0.1))
+        .force('charge', forceManyBody().strength(40))
         .force('center', forceCenter(width/2, height/2))
+        .force('radial', forceRadial(40, width/2, height/2))
+        .force('collide', forceCollide(80))
     },
     linkArc({ target: { x: tx, y: ty }, source: { x: sx, y: sy }}) {
       const r = Math.hypot(tx - sx, ty - sy)
@@ -137,31 +149,24 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
+$color-black-tint = #e6
+
 .visualization
   width 100%
   height 100%
 
-.controls
-  position fixed
-  top 16px
-  left 16px
-  background #f8f8f8
-  padding 0.5rem
-  display flex
-  flex-direction column
+.node
+  cursor grab
+  @media (hover: hover)
+    &:hover
+      fill $color-black-tint
+  &:active
+    cursor grabbing
 
-.svg-container
-  display table
-  border 1px solid #f8f8f8
-  box-shadow 1px 2px 4px rgba(0, 0, 0, .5)
-
-.controls > * + *
-  margin-top 1rem
-
-label
-  display block
-
-.links line
-  stroke #999
-  stroke-opacity 0.6
+.annotation
+  position absolute
+  top 50%
+  left 50%
+  text-align center
+  transform translate(-50%, -50%)
 </style>
