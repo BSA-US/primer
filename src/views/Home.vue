@@ -5,21 +5,22 @@ main
     @option-activated='onPillarFilterOptionActivated'
     @option-deactivated='onPillarFilterOptionDeactivated'
   )
-  VisualizationDualPowerProject.visualization(
+  DualPowerProject.visualization(
     v-if='ready'
     :pillar='activePillar'
   )
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-import { Filter, VisualizationDualPowerProject } from '@/components'
+import { mapGetters, mapState } from 'vuex'
+import { Filter } from '@/components'
+import { DualPowerProject } from '@/components/visualizations'
 
 export default {
   name: 'Home',
   components: {
     Filter,
-    VisualizationDualPowerProject
+    DualPowerProject
   },
   data() {
     return {
@@ -27,8 +28,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['links']),
-    ...mapState({
+    ...mapGetters('visualizations/dualPowerProject', ['links']),
+    ...mapState('visualizations/dualPowerProject', {
       pillars({ pillars }) {
         return pillars.map(({ color, id, name }) => ({
           ...{ color, id, name },
