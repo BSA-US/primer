@@ -15,6 +15,7 @@ export default {
       target: nodes.findIndex(({ id }) => id===t)
     })),
     graph: ({ nodes }, { links }) => ({ links, nodes }),
+    node: ({ nodes }) => id => nodes.find(n => n.id===id),
     pillar: ({ pillars }) => id => pillars.find(p => p.id===id)
   },
   mutations: {
