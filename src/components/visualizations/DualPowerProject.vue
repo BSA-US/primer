@@ -79,7 +79,7 @@ export default {
       }
     }
   },
-  computed: mapGetters(['graph']),
+  computed: mapGetters('visualizations/dualPowerProject', ['graph']),
   watch: {
     graph(newGraph, oldGraph) {
       if (!this.simulation && newGraph !== oldGraph) this.initSimulation()
