@@ -7,5 +7,5 @@ yarn
 
 ### Run
 ```
-yarn serve-remote
+yarn serve
 ```
