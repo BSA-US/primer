@@ -1,6 +1,6 @@
 <template lang='pug'>
 main
-  Filter(
+  Filter.filter(
     :options='pillars'
     @option-activated='onPillarFilterOptionActivated'
     @option-deactivated='onPillarFilterOptionDeactivated'
@@ -12,7 +12,7 @@ main
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 import { Filter } from '@/components'
 import { DualPowerProject } from '@/components/visualizations'
 
@@ -42,7 +42,15 @@ export default {
       return this.pillars.find(({ active }) => active)
     }
   },
+  created() {
+    this.hideNav()
+  },
+  beforeRouteLeave(_to, _from, next) {
+    this.showNav()
+    next()
+  },
   methods: {
+    ...mapMutations('app', ['hideNav', 'showNav']),
     onPillarFilterOptionActivated(name) {
       this.activePillarFilterOptions.push(name)
     },
@@ -57,7 +65,12 @@ export default {
 <style scoped lang='stylus'>
 main
   display flex
+  flex 1
   flex-direction column
+  height 100%
+
+.filter >>> ul
+  flex-shrink 0
 
 .visualization
   flex 1

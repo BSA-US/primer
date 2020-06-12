@@ -3,7 +3,7 @@ ul(:class='type')
   li(v-for='{ active, color, name } in options' :key='name')
     button(
       :class='{ active }'
-      :style='{ ["--color"]: color }'
+      :style='{ [`--color`]: color && `rgb(${color})`, [`--color-tint`]: color && `rgba(${color}, 0.5)` }'
       @click='onOptionClicked({ active, name })'
       v-text='name'
     )
@@ -37,15 +37,25 @@ export default {
 <style scoped lang='stylus'>
   ul
     border-bottom 1px solid black
-    display flex
-    justify-content center
-    padding 20px
+    padding var(--spacing-sm) var(--spacing-md)
+    scroll-snap-type x mandatory
+    overflow-x scroll
+    white-space nowrap
 
-    li:not(:last-child)
-      margin-right 40px
+    li
+      display inline-block
+      scroll-snap-align center
+      &:not(:last-child)
+        margin-right var(--spacing-md)
 
   button
-    background-color var(--color, moccasin)
+    padding var(--spacing-sm)
+    border 1px solid transparent
+    @media (hover: hover)
+      &:hover
+        border-color var(--color-tint, rgba(0, 0, 0, .25))
     &.active
+      background-color var(--color-tint, rgba(0, 0, 0, .05))
+      border-color var(--color, black)
       font-weight bold
 </style>
