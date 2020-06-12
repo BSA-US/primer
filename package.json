@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "serve-remote": "env VUE_APP_API_BASEURL=https://primer-git-dev.blacksocialists.now.sh/api vue-cli-service serve",
+    "dev-remote": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
   "dependencies": {
