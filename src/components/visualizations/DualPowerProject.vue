@@ -25,6 +25,8 @@
             :cy='n.y'
           )
           foreignObject.annotation-container(
+            width='100'
+            height='100'
             :x='n.x - 50'
             :y='n.y - 50'
           )
@@ -229,16 +231,12 @@ svg
               opacity 0.9
 
 .annotation-container
-  /.node &
-    width 100px
-    height 100px
-
   &, & *
     pointer-events none
     user-select none
 
   .annotation
-    position absolute
+    position fixed
     top 50%
     left 50%
     text-align center
