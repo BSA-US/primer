@@ -248,10 +248,8 @@ svg
       &
         width 100px
         height @width
-      &.matches-pillar &
+      &.matches-pillar ^[-1]
         font-weight bold
-      &:not(.matches-step) &
-        opacity 0.25
 
 @keyframes flow
   to
