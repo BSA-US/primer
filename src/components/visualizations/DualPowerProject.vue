@@ -253,5 +253,5 @@ svg
 
 @keyframes flow
   to
-    stroke-dashoffset 100
+    stroke-dashoffset -100
 </style>
