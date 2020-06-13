@@ -4,33 +4,46 @@ import { fetch } from '@/utils'
 export default {
   namespaced: true,
   state: {
-    flows: [],
+    _links: [],
     nodes: [],
     pillars: [],
+    steps: [],
     ready: false
   },
   getters: {
-    links: ({ flows, nodes }) => flows.map(({ from: [f], to: [t] }) => ({
-      source: nodes.findIndex(({ id }) => id===f),
-      target: nodes.findIndex(({ id }) => id===t)
-    })),
+    links: ({ _links, nodes }) =>
+      _links.map(({ from: [fid], to: [tid] }) => ({
+        source: nodes.findIndex(({ id }) => id===fid),
+        target: nodes.findIndex(({ id }) => id===tid)
+      })),
     graph: ({ nodes }, { links }) => ({ links, nodes }),
     node: ({ nodes }) => id => nodes.find(n => n.id===id),
-    pillar: ({ pillars }) => id => pillars.find(p => p.id===id)
+    nodeIndex: ({ nodes }) => id => nodes.findIndex(n => n.id===id),
+    pillar: ({ pillars }) => id => pillars.find(p => p.id===id),
+    pillarIndex: ({ pillars }) => id => pillars.findIndex(p => p.id===id),
+    step: ({ steps }) => id => steps.find(n => n.id===id),
+    stepIndex: ({ steps }) => id => steps.findIndex(n => n.id===id),
   },
   mutations: {
-    addFlow(state, f) { state.flows.push(f) },
+    addLink(state, l) { state._links.push(l) },
     addNode(state, n) { state.nodes.push(n) },
     addPillar(state, p) { state.pillars.push(p) },
+    addStep(state, s) { state.steps.push(s) },
     ready(state) { state.ready = true }
   },
   actions: {
     async init({ commit }) {
-      const { flows, nodes, pillars } = await fetch(api.endpoints.config)
+      const {
+        links,
+        nodes,
+        pillars,
+        steps
+      } = await fetch(api.endpoints.config)
 
-      flows.forEach(f => commit('addFlow', f)),
+      links.forEach(l => commit('addLink', l)),
       nodes.forEach(n => commit('addNode', n)),
       pillars.forEach(p => commit('addPillar', p))
+      steps.forEach(s => commit('addStep', s))
 
       commit('ready')
     }

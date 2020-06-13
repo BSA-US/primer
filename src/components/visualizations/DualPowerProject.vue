@@ -1,6 +1,6 @@
 <template lang='pug'>
 .visualization(ref='visualization')
-  svg#svg(
+  svg(
     v-if='simulation'
     pointer-events='all'
     preserveAspectRatio='xMinYMin meet'
@@ -9,22 +9,26 @@
     g.links(fill='none')
       path.link(
         v-for='l in graph.links' :key='l.id'
-        :class='{ "matches-pillar": linkMatchesPillar(l) }'
+        :class='{ "matches-pillar": linkMatchesPillar(l), "matches-step": linkMatchesStep(l) }'
         :d='linkArc(l)'
       )
     g.nodes
       template(v-for='n in graph.nodes' :key='n.id')
-        circle.node(
-          :class='{ "matches-pillar": nodeMatchesPillar(n) }'
-          :style='{ fill: nodeColor(n) }'
-          :cx='n.x'
-          :cy='n.y'
-        )
-        foreignObject.annotation-container(
-          :x='n.x - 50'
-          :y='n.y - 50'
-        )
-          span.annotation(v-text='n.name')
+        g.node(:class='{ "matches-pillar": nodeMatchesPillar(n), "matches-step": nodeMatchesStep(n) }')
+          circle.background(
+            :cx='n.x'
+            :cy='n.y'
+          )
+          circle.foreground(
+            :style='{ fill: nodeColor(n) }'
+            :cx='n.x'
+            :cy='n.y'
+          )
+          foreignObject.annotation-container(
+            :x='n.x - 50'
+            :y='n.y - 50'
+          )
+            span.annotation(v-text='n.name')
 </template>
 
 <script>
@@ -43,7 +47,11 @@ import { event, selectAll } from 'd3-selection'
 export default {
   name: 'VisualizationDualPowerProject',
   props: {
-    pillar: {
+    activePillar: {
+      validator: value =>
+        Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
+    },
+    activeStep: {
       validator: value =>
         Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
     }
@@ -58,7 +66,11 @@ export default {
       }
     }
   },
-  computed: mapGetters('visualizations/dualPowerProject', ['graph', 'node']),
+  computed: mapGetters('visualizations/dualPowerProject', [
+    'graph',
+    'node',
+    'stepIndex'
+  ]),
   watch: {
     graph(newGraph, oldGraph) {
       if (!this.simulation && newGraph !== oldGraph) this.initSimulation()
@@ -104,18 +116,26 @@ export default {
       `
     },
     linkColor(link) {
-      return this.linkMatchesPillar(link) ? this.pillar.color : null
+      return this.linkMatchesPillar(link) ? this.activePillar.color : null
     },
     linkMatchesPillar({ source, target }) {
       return [source, target].every(({ id }) =>
         this.nodeMatchesPillar(this.node(id))
       )
     },
-    nodeColor(node) {
-      if (this.nodeMatchesPillar(node)) return `rgb(${this.pillar.color})`
+    linkMatchesStep({ source, target }) {
+      return [source, target].every(({ id }) =>
+        this.nodeMatchesStep(this.node(id))
+      )
     },
-    nodeMatchesPillar(node) {
-      return node.pillars?.includes(this.pillar?.id)
+    nodeColor(node) {
+      if (this.nodeMatchesPillar(node)) return `rgb(${this.activePillar.color})`
+    },
+    nodeMatchesPillar({ pillars }) {
+      return pillars?.includes(this.activePillar?.id)
+    },
+    nodeMatchesStep({ step }) {
+      return !this.activeStep || step && this.stepIndex(step && step[0]) <= this.stepIndex(this.activeStep?.id)
     },
     onNodeDragStarted() {
       this.activeNodeDrags += 1
@@ -143,6 +163,7 @@ export default {
         this.simulation.alphaTarget(0.3).restart()
     },
     setConstraints() {
+      console.log(this.$refs.visualization)
       this.renderer.width = this.$refs.visualization.clientWidth
       this.renderer.height = this.$refs.visualization.clientHeight
     },
@@ -151,42 +172,64 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
-$color-black-tint = #e6
-$stroke-width = 2px
-$stroke-width-matches-pillar = 2 * $stroke-width
+$color-black-tint = rgba(0, 0, 0, 0.05)
+$color-black-shadow = rgba(0, 0, 0, 0.1)
+$color-black-hint = rgba(0, 0, 0, 0.25)
+$color-white-tint = rgba(255, 255, 255, 0.1)
+$color-white-shadow = rgba(255, 255, 255, 0.1)
+$color-white-hint = rgba(255, 255, 255, 0.25)
 
 stroke-width()
   stroke-width 2px
   &.matches-pillar
     stroke-width 4px
 
+text-color()
+  color $color-black-hint
+  &.matches-step
+    color black
+
 .visualization
+  position relative
+
+svg
   width 100%
   height 100%
 
 .link
   stroke-width()
   animation flow 2s linear infinite
-  stroke $color-black-tint
+  stroke $color-black-shadow
   stroke-dasharray 10px
   &.matches-pillar
-    stroke black
     animation-duration 1s
+    &.matches-step
+      stroke black
 
 .node
   stroke-width()
   cursor grab
-  fill white
-  r 60px
-  stroke black
-  @media (hover: hover)
-    &:hover
-      fill $color-black-tint
-  &:active
-    cursor grabbing
+  circle
+    fill white
+    r 60px
+    &.foreground
+      stroke black
+      &:active
+        cursor grabbing
+      ~/
+        &:not(.matches-step)^[-1]
+          opacity 0.25 !important
+        &:not(.matches-pillar)^[-1]
+          @media(hover: hover)
+            &:hover
+              fill $color-black-tint
+        &.matches-pillar^[-1]
+          @media(hover: hover)
+            &:hover
+              opacity 0.9
 
 .annotation-container
-  /.nodes &
+  /.node &
     width 100px
     height 100px
 
@@ -200,8 +243,17 @@ stroke-width()
     left 50%
     text-align center
     transform translate(-50%, -50%)
-    /.matches-pillar + &
-      font-weight bold
+    color $color-black-hint
+    /.matches-step &
+      color initial
+    /.node
+      &
+        width 100px
+        height @width
+      &.matches-pillar &
+        font-weight bold
+      &:not(.matches-step) &
+        opacity 0.25
 
 @keyframes flow
   to

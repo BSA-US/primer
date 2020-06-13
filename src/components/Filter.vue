@@ -1,12 +1,13 @@
 <template lang='pug'>
-ul(:class='type')
-  li(v-for='{ active, color, name } in options' :key='name')
-    button(
-      :class='{ active }'
-      :style='{ [`--color`]: color && `rgb(${color})`, [`--color-tint`]: color && `rgba(${color}, 0.5)` }'
-      @click='onOptionClicked({ active, name })'
-      v-text='name'
-    )
+.filter(:class='type')
+  ul
+    li(v-for='{ active, color, name } in options' :key='name')
+      button(
+        :class='{ active }'
+        :style='{ [`--color`]: color && `rgb(${color})`, [`--color-tint`]: color && `rgba(${color}, 0.5)` }'
+        @click='onOptionClicked({ active, name })'
+        v-text='name'
+      )
 </template>
 
 <script>
@@ -35,11 +36,16 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
+  .filter
+    display flex
+    justify-content center
+
   ul
-    border-bottom 1px solid black
+    display inline-block
     padding var(--spacing-sm) var(--spacing-md)
     scroll-snap-type x mandatory
     overflow-x scroll
+    overflow-y hidden
     white-space nowrap
 
     li
@@ -58,4 +64,18 @@ export default {
       background-color var(--color-tint, rgba(0, 0, 0, .05))
       border-color var(--color, black)
       font-weight bold
+    /.linear li:not(:last-child) &
+      $icon-size = 24px
+      position relative
+      margin-right $icon-size
+      &::after
+        display block
+        position absolute
+        top 50%
+        transform translateY(-50%)
+        right -1.5 * $icon-size
+        width $icon-size
+        height @width
+        background-image url(https://unpkg.com/@mdi/svg@5.3.45/svg/menu-right.svg)
+        content ' '
 </style>

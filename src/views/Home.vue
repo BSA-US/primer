@@ -7,7 +7,14 @@ main
   )
   DualPowerProject.visualization(
     v-if='ready'
-    :pillar='activePillar'
+    :activePillar='activePillar'
+    :activeStep='activeStep'
+  )
+  Filter.filter(
+    type='linear'
+    :options='steps'
+    @option-activated='onStepFilterOptionActivated'
+    @option-deactivated='onStepFilterOptionDeactivated'
   )
 </template>
 
@@ -24,7 +31,8 @@ export default {
   },
   data() {
     return {
-      activePillarFilterOptions: []
+      activePillarFilterOptions: [],
+      activeStepFilterOptions: []
     }
   },
   computed: {
@@ -36,10 +44,19 @@ export default {
           active: this.activePillarFilterOptions.includes(name)
         }))
       },
+      steps({ steps }) {
+        return steps.map(({ color, id, name }) => ({
+          ...{ color, id, name },
+          active: this.activeStepFilterOptions.includes(name)
+        }))
+      },
       ready: 'ready'
     }),
     activePillar() {
       return this.pillars.find(({ active }) => active)
+    },
+    activeStep() {
+      return this.steps.find(({ active }) => active)
     }
   },
   created() {
@@ -57,20 +74,34 @@ export default {
     onPillarFilterOptionDeactivated(name) {
       this.activePillarFilterOptions =
         this.activePillarFilterOptions.filter(o => o!==name)
+    },
+    onStepFilterOptionActivated(name) {
+      this.activeStepFilterOptions.push(name)
+    },
+    onStepFilterOptionDeactivated(name) {
+      this.activeStepFilterOptions =
+        this.activeStepFilterOptions.filter(o => o!==name)
     }
   }
 }
 </script>
 
 <style scoped lang='stylus'>
+$border = 1px solid black
+
 main
   display flex
   flex 1
   flex-direction column
   height 100%
+  overflow-y: hidden
 
-.filter >>> ul
+.filter
   flex-shrink 0
+  &:first-child
+    border-bottom $border
+  &:last-child
+    border-top $border
 
 .visualization
   flex 1
