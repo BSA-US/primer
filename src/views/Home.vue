@@ -94,7 +94,7 @@ main
   flex 1
   flex-direction column
   height 100%
-  overflow-y: hidden
+  overflow hidden
 
 .filter
   flex-shrink 0

@@ -7,11 +7,18 @@
     :viewBox='`0 0 ${renderer.width} ${renderer.height}`'
   )
     g.links(fill='none')
-      path.link(
+      g.link(
         v-for='l in graph.links' :key='l.id'
         :class='{ "matches-pillar": linkMatchesPillar(l), "matches-step": linkMatchesStep(l) }'
-        :d='linkArc(l)'
       )
+        path(:d='linkArc(l)')
+        foreignObject.annotation-container(
+          width='100'
+          height='100'
+          :x='linkMidpoint(l).x - 50'
+          :y='linkMidpoint(l).y - 50'
+        )
+          span.annotation(v-text='l.annotation')
     g.nodes
       template(v-for='n in graph.nodes' :key='n.id')
         g.node(:class='{ "matches-pillar": nodeMatchesPillar(n), "matches-step": nodeMatchesStep(n) }')
@@ -34,7 +41,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
 import {
   forceCenter,
   forceCollide,
@@ -45,6 +52,9 @@ import {
 } from 'd3-force'
 import { drag } from 'd3-drag'
 import { event, selectAll } from 'd3-selection'
+
+const { mapGetters, mapState } =
+  createNamespacedHelpers('visualizations/dualPowerProject')
 
 export default {
   name: 'VisualizationDualPowerProject',
@@ -68,17 +78,29 @@ export default {
       }
     }
   },
-  computed: mapGetters('visualizations/dualPowerProject', [
-    'graph',
-    'node',
-    'stepIndex'
-  ]),
+  computed: {
+    ...mapGetters(['links', 'node', 'stepIndex' ]),
+    ...mapState(['nodes']),
+    graph() {
+      return {
+        links: this.activePillar
+          ? this.links.filter(l => this.linkMatchesPillar(l))
+          : this.links,
+        nodes: this.activePillar
+          ? this.nodes.filter(n => this.nodeMatchesPillar(n))
+          : this.nodes
+      }
+    }
+  },
   watch: {
+    activePillar(newPillar, oldPillar) {
+      if (newPillar !== oldPillar) this.initSimulation()
+    },
     graph(newGraph, oldGraph) {
       if (!this.simulation && newGraph !== oldGraph) this.initSimulation()
     },
     simulation(newSimulation, oldSimulation) {
-      if (newSimulation && !oldSimulation) {
+      if (newSimulation !== oldSimulation) {
         selectAll('.node').call(drag()
           .on('start', this.onNodeDragStarted)
           .on('drag', this.onNodeDragged)
@@ -104,11 +126,20 @@ export default {
       } = this
 
       this.simulation = forceSimulation(nodes)
-        .force('link', forceLink(links).distance(360).strength(0.1))
+        .force('link', forceLink(links).distance(360).strength(0.2))
         .force('charge', forceManyBody().strength(40))
-        .force('center', forceCenter(width/2, height/2))
+        //.force('center', forceCenter(width/2, height/2))
         .force('radial', forceRadial(40, width/2, height/2))
-        .force('collide', forceCollide(80))
+        .force('collide', forceCollide(100))
+    },
+    linkMidpoint({ target: { x: tx, y: ty }, source: { x: sx, y: sy }}) {
+      const [xMinuend, xSubtrahend] = tx > sx ? [tx, sx] : [sx, tx]
+      const [yMinuend, ySubtrahend] = ty > sy ? [ty, sy] : [sy, ty]
+
+      return {
+        x: xSubtrahend + (xMinuend - xSubtrahend)/2,
+        y: ySubtrahend + (yMinuend - ySubtrahend)/2
+      }
     },
     linkArc({ target: { x: tx, y: ty }, source: { x: sx, y: sy }}) {
       const r = Math.hypot(tx - sx, ty - sy)
@@ -201,18 +232,21 @@ svg
 .link
   stroke-width()
   animation flow 2s linear infinite
-  stroke $color-black-shadow
-  stroke-dasharray 10px
-  &.matches-pillar
-    animation-duration 1s
-    &.matches-step
-      stroke black
+  path
+    stroke $color-black-shadow
+    stroke-dasharray 10px
+    ~/
+      &.matches-pillar^[-1]
+        animation-duration 1s
+      &.matches-step^[-1]
+        stroke black
 
 .node
   stroke-width()
   cursor grab
   circle
     fill white
+    stroke white
     r 60px
     &.foreground
       stroke black
@@ -244,16 +278,21 @@ svg
     color $color-black-hint
     /.matches-step &
       color initial
+    /.link
+      & ^[-1]
+        font-size 12px
+        display none
+      &.matches-pillar ^[-1]
+        display initial
+
     /.node
       &
         width 100px
         height @width
-      &.matches-pillar &
+      &.matches-pillar ^[-1]
         font-weight bold
-      &:not(.matches-step) &
-        opacity 0.25
 
 @keyframes flow
   to
-    stroke-dashoffset 100
+    stroke-dashoffset -100
 </style>
