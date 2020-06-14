@@ -39,6 +39,9 @@ export default {
   .filter
     display flex
     justify-content center
+    user-select none
+    *::-webkit-scrollbar
+      display none
 
   ul
     display inline-block

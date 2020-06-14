@@ -12,11 +12,11 @@ export default {
   },
   getters: {
     links: ({ _links, nodes }) =>
-      _links.map(({ from: [fid], to: [tid] }) => ({
+      _links.map(({ annotation, from: [fid], to: [tid] }) => ({
+        annotation,
         source: nodes.findIndex(({ id }) => id===fid),
         target: nodes.findIndex(({ id }) => id===tid)
       })),
-    graph: ({ nodes }, { links }) => ({ links, nodes }),
     node: ({ nodes }) => id => nodes.find(n => n.id===id),
     nodeIndex: ({ nodes }) => id => nodes.findIndex(n => n.id===id),
     pillar: ({ pillars }) => id => pillars.find(p => p.id===id),
