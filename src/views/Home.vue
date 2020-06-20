@@ -98,6 +98,7 @@ main
 
 .filter
   flex-shrink 0
+  z-index 6910
   &:first-child
     border-bottom $border
   &:last-child
@@ -105,4 +106,5 @@ main
 
 .visualization
   flex 1
+  z-index 6900
 </style>

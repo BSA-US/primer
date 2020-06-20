@@ -1,9 +1,10 @@
 <template lang='pug'>
-.visualization(ref='visualization')
+.visualization(:id='rootId', ref='visualization')
   svg(
     v-if='simulation'
     pointer-events='all'
     preserveAspectRatio='xMinYMin meet'
+    :style='rendererCssVariables'
     :viewBox='`0 0 ${renderer.width} ${renderer.height}`'
   )
     g.links(fill='none')
@@ -51,7 +52,9 @@ import {
   forceSimulation
 } from 'd3-force'
 import { drag } from 'd3-drag'
-import { event, selectAll } from 'd3-selection'
+import { zoom } from 'd3-zoom'
+import { event, select, selectAll } from 'd3-selection'
+import { snakeCase } from 'change-case'
 
 const { mapGetters, mapState } =
   createNamespacedHelpers('visualizations/dualPowerProject')
@@ -71,24 +74,26 @@ export default {
   data() {
     return {
       activeNodeDrags: 0,
+      rootId: 'dual-power-project-visualization',
       simulation: null,
       renderer: {
-        width: 600,
-        height: 400
+        width: 0,
+        height: 0,
+        scale: 1
       }
     }
   },
   computed: {
-    ...mapGetters(['links', 'node', 'stepIndex' ]),
-    ...mapState(['nodes']),
-    graph() {
+    ...mapGetters('visualizations/dualPowerProject', [
+      'graph',
+      'node',
+      'stepIndex'
+    ]),
+    rendererCssVariables() {
       return {
-        links: this.activePillar
-          ? this.links.filter(l => this.linkMatchesPillar(l))
-          : this.links,
-        nodes: this.activePillar
-          ? this.nodes.filter(n => this.nodeMatchesPillar(n))
-          : this.nodes
+        ['--width']: `${this.renderer.width}px`,
+        ['--height']: `${this.renderer.height}px`,
+        ['--scale']: this.renderer.scale
       }
     }
   },
@@ -100,8 +105,8 @@ export default {
       if (!this.simulation && newGraph !== oldGraph) this.initSimulation()
     },
     simulation(newSimulation, oldSimulation) {
-      if (newSimulation !== oldSimulation) {
-        selectAll('.node').call(drag()
+      if (newSimulation && !oldSimulation) {
+        selectAll(`#${this.rootId} .node`).call(drag()
           .on('start', this.onNodeDragStarted)
           .on('drag', this.onNodeDragged)
           .on('end', this.onNodeDragEnded)
@@ -110,15 +115,32 @@ export default {
     }
   },
   mounted() {
+    this.attachListeners()
     this.setConstraints()
-    window.addEventListener('resize', this.onResized)
 
     if (this.graph) this.initSimulation()
   },
   beforeDestroy() {
-    window.removeEventLister('resize', this.onResized)
+    this.detachListeners()
   },
   methods: {
+    attachListeners() {
+      window.addEventListener('resize', this.onResized)
+      select(`#${this.rootId}`).call(zoom()
+        .on('zoom', this.onZoomed)
+      )
+    },
+    detachListeners() {
+      window.removeEventLister('resize', this.onResized)
+      select(`#${this.rootId}`).call(zoom()
+        .on('zoom', null)
+      ),
+      selectAll(`#${this.rootId} .node`).call(drag()
+        .on('start', null)
+        .on('drag', null)
+        .on('end', null)
+      )
+    },
     initSimulation() {
       const {
         graph: { links, nodes },
@@ -187,6 +209,9 @@ export default {
       this.setConstraints()
       this.initSimulation()
     },
+    onZoomed() {
+      this.renderer.scale = Math.max(0.1, Math.min(event.transform.k, 2))
+    },
     relaxSimulation({ force = false } = {}) {
       if (!this.activeNodeDrags || force)
         this.simulation.alphaTarget(0)
@@ -197,8 +222,8 @@ export default {
     },
     setConstraints() {
       console.log(this.$refs.visualization)
-      this.renderer.width = this.$refs.visualization.clientWidth
-      this.renderer.height = this.$refs.visualization.clientHeight
+      this.renderer.width = this.$refs.visualization.clientWidth * 100
+      this.renderer.height = this.$refs.visualization.clientHeight * 100
     },
   }
 }
@@ -226,8 +251,13 @@ text-color()
   position relative
 
 svg
-  width 100%
-  height 100%
+  fill white
+  width var(--width, 100%)
+  height var(--height, 100%)
+  position absolute
+  top 50%
+  left 50%
+  transform translate(-50%, -50%) scale(var(--scale, 1))
 
 .link
   stroke-width()
