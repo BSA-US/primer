@@ -37,6 +37,7 @@ export default {
 
 <style scoped lang='stylus'>
   .filter
+    background-color white
     display flex
     justify-content center
     user-select none
