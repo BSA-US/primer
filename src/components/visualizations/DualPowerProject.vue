@@ -84,11 +84,18 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('visualizations/dualPowerProject', [
-      'graph',
-      'node',
-      'stepIndex'
-    ]),
+    ...mapGetters(['links', 'node', 'stepIndex']),
+    ...mapState(['nodes']),
+    graph() {
+      return {
+        links: this.activePillar
+          ? this.links.filter(l => this.linkMatchesPillar(l))
+          : this.links,
+        nodes: this.activePillar
+          ? this.nodes.filter(n => this.nodeMatchesPillar(n))
+          : this.nodes
+      }
+    },
     rendererCssVariables() {
       return {
         ['--width']: `${this.renderer.width}px`,
@@ -126,15 +133,11 @@ export default {
   methods: {
     attachListeners() {
       window.addEventListener('resize', this.onResized)
-      select(`#${this.rootId}`).call(zoom()
-        .on('zoom', this.onZoomed)
-      )
+      select(`#${this.rootId}`).call(zoom().on('zoom', this.onZoomed))
     },
     detachListeners() {
       window.removeEventLister('resize', this.onResized)
-      select(`#${this.rootId}`).call(zoom()
-        .on('zoom', null)
-      ),
+      select(`#${this.rootId}`).call(zoom().on('zoom', null)),
       selectAll(`#${this.rootId} .node`).call(drag()
         .on('start', null)
         .on('drag', null)
@@ -221,7 +224,6 @@ export default {
         this.simulation.alphaTarget(0.3).restart()
     },
     setConstraints() {
-      console.log(this.$refs.visualization)
       this.renderer.width = this.$refs.visualization.clientWidth * 100
       this.renderer.height = this.$refs.visualization.clientHeight * 100
     },
