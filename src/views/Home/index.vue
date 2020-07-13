@@ -16,6 +16,7 @@ main
     @option-activated='onStepFilterOptionActivated'
     @option-deactivated='onStepFilterOptionDeactivated'
   )
+  router-link(to='/about')
 </template>
 
 <script>
@@ -105,4 +106,23 @@ main
   right 0
   bottom 0
   z-index 6900
+
+a
+  z-index 6920
+  display block
+  position fixed
+  bottom calc(20px + 3 * var(--spacing-md))
+  left var(--spacing-sm)
+  background-color var(--color-secondary)
+  mask url(https://unpkg.com/@mdi/svg@5.3.45/svg/information-outline.svg)
+  mask-size calc(var(--spacing-md) + var(--spacing-sm))
+  content ' '
+  width calc(var(--spacing-md) + var(--spacing-sm))
+  height @width
+  @media (min-width: 480px)
+    bottom calc(24px + 3 * var(--spacing-md))
+  @media (hover: hover)
+    &:hover
+      background-color var(--color)
+      left calc(var(--spacing-sm) + calc(var(--spacing-xs) / 2))
 </style>

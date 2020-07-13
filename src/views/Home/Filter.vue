@@ -83,11 +83,13 @@ export default {
   ul
     display inline-block
     max-width 100%
-    padding calc(var(--spacing-sm) + var(--spacing-md)) var(--spacing-md)
+    padding var(--spacing-sm) var(--spacing-xs)
     scroll-snap-type x mandatory
     overflow-x scroll
     overflow-y hidden
     white-space nowrap
+    @media (min-width 480px)
+      padding calc(var(--spacing-sm) + var(--spacing-md)) var(--spacing-md)
     /.filter
       &:not(.linear) ^[-1]
         padding-right: var(--end-padding, 0)
@@ -101,23 +103,28 @@ export default {
           & ^[-2]
             scroll-snap-align start
           & ^[-3]
-            scroll-padding-left var(--spacing-lg)
+            scroll-padding-left var(--spacing-md)
+            @media (min-width 480px)
+              scroll-padding-left var(--spacing-lg)
         &.linear
           & ^[-2]
             scroll-snap-align end
           & ^[-3]
-            scroll-padding-right var(--spacing-lg)
+            scroll-padding-right var(--spacing-md)
+            @media (min-width 480px)
+              scroll-padding-right var(--spacing-lg)
 
   button
     color var(--color-secondary)
     font-family var(--font-family-header)
-    font-size 15px
+    font-size 16px
     line-height 20px
     font-weight bold
-    padding var(--spacing-sm) var(--spacing-md)
+    padding var(--spacing-sm) calc(var(--spacing-sm) + var(--spacing-xs))
     @media (min-width 480px)
       font-size 20px
       line-height 24px
+      padding var(--spacing-sm) var(--spacing-md)
     @media (hover: hover)
       &:hover
         color var(--color)
@@ -132,7 +139,7 @@ export default {
       &::after
         display block
         position absolute
-        bottom 0%
+        bottom 0
         left 50%
         transform translate(-50%, 50%)
         width 10px
@@ -143,24 +150,36 @@ export default {
         content ' '
 
   span
-    padding var(--spacing-lg)
+    padding var(--spacing-md)
     max-width 320px
     position relative
     left 0
     right 0
-    transition left 300ms ease-in-out
+    transition all 150ms ease-in-out
+    @media (min-width 480px)
+      padding var(--spacing-lg)
     /.filter
       &:not(.linear) ^[-1]
         margin-top calc(-1 * var(--spacing-sm))
         padding-top 0
+        @media (min-width 480px)
+          margin-bottom calc(-1 * var(--spacing-md))
         &.inset
-          left var(--spacing-md)
-          right calc(-1 * var(--spacing-md))
+          left calc(var(--spacing-md) - var(--spacing-xs))
+          right calc(-1 * calc(var(--spacing-md) - var(--spacing-xs)))
+          @media (min-width 480px)
+            left var(--spacing-md)
+            right calc(-1 * var(--spacing-md))
       &.linear ^[-1]
         margin-bottom calc(-1 * var(--spacing-sm))
         padding-bottom 0
         order -1
+        @media (min-width 480px)
+          margin-bottom calc(-1 * var(--spacing-md))
         &.inset
-          right var(--spacing-md)
-          left calc(-1 * var(--spacing-md))
+          right calc(var(--spacing-md) - var(--spacing-xs))
+          left calc(-1 * calc(var(--spacing-md) - var(--spacing-xs)))
+          @media (min-width 480px)
+            right var(--spacing-md)
+            left calc(-1 * var(--spacing-md))
 </style>
