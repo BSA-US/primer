@@ -62,14 +62,8 @@ const { mapGetters, mapState } =
 export default {
   name: 'VisualizationDualPowerProject',
   props: {
-    activePillar: {
-      validator: value =>
-        Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
-    },
-    activeStep: {
-      validator: value =>
-        Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
-    }
+    activePillar: Object,
+    activeStep: Object
   },
   data() {
     return {
@@ -233,9 +227,9 @@ export default {
 
 <style scoped lang='stylus'>
 stroke-width()
-  stroke-width 2px
+  stroke-width 1px
   &.matches-pillar
-    stroke-width 4px
+    stroke-width 2px
 
 text-color()
   color var(--color-hint)

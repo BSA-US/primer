@@ -38,14 +38,14 @@ export default {
     ...mapGetters('visualizations/dualPowerProject', ['links']),
     ...mapState('visualizations/dualPowerProject', {
       pillars({ pillars }) {
-        return pillars.map(({ color, id, name }) => ({
-          ...{ color, id, name },
+        return pillars.map(({ color, id, name, description }) => ({
+          ...{ color, id, name, description },
           active: this.activePillarFilterOptions.includes(name)
         }))
       },
       steps({ steps }) {
-        return steps.map(({ color, id, name }) => ({
-          ...{ color, id, name },
+        return steps.map(({ color, id, name, description }) => ({
+          ...{ color, id, name, description },
           active: this.activeStepFilterOptions.includes(name)
         }))
       },
