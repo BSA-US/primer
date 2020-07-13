@@ -3,7 +3,7 @@ mixin circles
   .circles: .circle(v-for="n in 4")
 
 header
-  span <router-link to="/">Title</router-link> is a map of a functioning Solidarity Economy.
+  span <router-link to="/">This</router-link> is a map of a functioning Solidarity Economy.
 main
   div
     +circles
@@ -23,12 +23,18 @@ footer
     max-width 640px
     align-self center
     &:not(:last-child)
-      margin-bottom var(--spacing-lg)
+      margin-bottom var(--spacing-md)
+      @media (min-width 480px)
+        margin-bottom var(--spacing-lg)
 
   header
-    margin-top var(--spacing-xl)
-    font-size 40px
-    line-height 40px
+    margin-top var(--spacing-lg)
+    font-size 30px
+    line-height 35px
+    @media (min-width 480px)
+      margin-top var(--spacing-xl)
+      font-size 40px
+      line-height 40px
     a
       font-family var(--font-family-header)
       font-weight bold
@@ -58,9 +64,11 @@ footer
         text-align right
 
   footer
-    margin-bottom var(--spacing-xl)
     display flex
     justify-content space-between
+    margin-bottom var(--spacing-lg)
+    @media (min-width 480px)
+      margin-bottom var(--spacing-xl)
     & > *
       &:not(:last-child)
         margin-right var(--spacing-lg)

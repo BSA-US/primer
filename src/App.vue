@@ -1,6 +1,6 @@
 <template lang='pug'>
 nav(v-if='!hideNav')
-  router-link(id='app-back' to='/') Home
+  //router-link(id='app-back' to='/') Home
 router-view
 </template>
 
