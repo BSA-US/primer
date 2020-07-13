@@ -4,7 +4,7 @@
     li(v-for='{ active, color, name } in options' :key='name')
       button(
         :class='{ active }'
-        :style='{ [`--color`]: color && `rgb(${color})`, [`--color-tint`]: color && `rgba(${color}, 0.5)` }'
+        :style='{ [`--color`]: active && color && `rgb(${color})` || null }'
         @click='onOptionClicked({ active, name })'
         v-text='name'
       )
@@ -37,16 +37,18 @@ export default {
 
 <style scoped lang='stylus'>
   .filter
-    background-color white
     display flex
-    justify-content center
+    justify-content flex-start
     user-select none
     *::-webkit-scrollbar
       display none
+    &.linear {
+      justify-content flex-end
+    }
 
   ul
     display inline-block
-    padding var(--spacing-sm) var(--spacing-md)
+    padding calc(var(--spacing-sm) + var(--spacing-md))
     scroll-snap-type x mandatory
     overflow-x scroll
     overflow-y hidden
@@ -55,31 +57,35 @@ export default {
     li
       display inline-block
       scroll-snap-align center
-      &:not(:last-child)
-        margin-right var(--spacing-md)
 
   button
-    padding var(--spacing-sm)
-    border 1px solid transparent
+    color var(--color-secondary)
+    font-family var(--font-family-header)
+    font-size 20px
+    line-height 24px
+    font-weight bold
+    padding var(--spacing-sm) var(--spacing-md)
     @media (hover: hover)
       &:hover
-        border-color var(--color-tint, rgba(0, 0, 0, .25))
+        color var(--color)
     &.active
-      background-color var(--color-tint, rgba(0, 0, 0, .05))
-      border-color var(--color, black)
-      font-weight bold
-    /.linear li:not(:last-child) &
-      $icon-size = 24px
+      color var(--color)
+      @media (hover: hover)
+        &:hover
+          color var(--color-hint)
+    /.linear &
+      border-bottom 1px solid var(--color)
       position relative
-      margin-right $icon-size
       &::after
         display block
         position absolute
-        top 50%
-        transform translateY(-50%)
-        right -1.5 * $icon-size
-        width $icon-size
+        bottom 0%
+        left 50%
+        transform translate(-50%, 50%)
+        width 10px
         height @width
-        background-image url(https://unpkg.com/@mdi/svg@5.3.45/svg/menu-right.svg)
+        background-color var(--color)
+        mask url(https://unpkg.com/@mdi/svg@5.3.45/svg/circle.svg)
+        mask-size cover
         content ' '
 </style>

@@ -232,28 +232,21 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
-$color-black-tint = rgba(0, 0, 0, 0.05)
-$color-black-shadow = rgba(0, 0, 0, 0.1)
-$color-black-hint = rgba(0, 0, 0, 0.25)
-$color-white-tint = rgba(255, 255, 255, 0.1)
-$color-white-shadow = rgba(255, 255, 255, 0.1)
-$color-white-hint = rgba(255, 255, 255, 0.25)
-
 stroke-width()
   stroke-width 2px
   &.matches-pillar
     stroke-width 4px
 
 text-color()
-  color $color-black-hint
+  color var(--color-hint)
   &.matches-step
-    color black
+    color var(--color)
 
 .visualization
   position relative
 
 svg
-  fill white
+  fill var(--background-color)
   width var(--width, 100%)
   height var(--height, 100%)
   position absolute
@@ -265,23 +258,23 @@ svg
   stroke-width()
   animation flow 2s linear infinite
   path
-    stroke $color-black-shadow
+    stroke var(--color-stroke)
     stroke-dasharray 10px
     ~/
       &.matches-pillar^[-1]
         animation-duration 1s
       &.matches-step^[-1]
-        stroke black
+        stroke var(--color)
 
 .node
   stroke-width()
   cursor grab
   circle
-    fill white
-    stroke white
+    fill var(--background-color)
+    stroke var(--background-color)
     r 60px
     &.foreground
-      stroke black
+      stroke var(--color)
       &:active
         cursor grabbing
       ~/
@@ -290,7 +283,7 @@ svg
         &:not(.matches-pillar)^[-1]
           @media(hover: hover)
             &:hover
-              fill $color-black-tint
+              fill var(--color-tint)
         &.matches-pillar^[-1]
           @media(hover: hover)
             &:hover
@@ -307,9 +300,9 @@ svg
     left 50%
     text-align center
     transform translate(-50%, -50%)
-    color $color-black-hint
+    color var(--color-hint)
     /.matches-step &
-      color initial
+      color var(--color)
     /.link
       & ^[-1]
         font-size 12px

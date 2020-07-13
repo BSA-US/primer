@@ -1,16 +1,16 @@
 <template lang='pug'>
 main
-  Filter.filter(
+  Filter(
     :options='pillars'
     @option-activated='onPillarFilterOptionActivated'
     @option-deactivated='onPillarFilterOptionDeactivated'
   )
-  DualPowerProject.visualization(
+  Visualization(
     v-if='ready'
     :activePillar='activePillar'
     :activeStep='activeStep'
   )
-  Filter.filter(
+  Filter(
     type='linear'
     :options='steps'
     @option-activated='onStepFilterOptionActivated'
@@ -20,14 +20,13 @@ main
 
 <script>
 import { mapGetters, mapMutations, mapState } from 'vuex'
-import { Filter } from '@/components'
-import { DualPowerProject } from '@/components/visualizations'
+import { Filter, Visualization } from './'
 
 export default {
   name: 'Home',
   components: {
     Filter,
-    DualPowerProject
+    Visualization
   },
   data() {
     return {
@@ -87,24 +86,23 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
-$border = 1px solid black
-
 main
   display flex
   flex 1
   flex-direction column
+  justify-content space-between
   height 100%
   overflow hidden
 
 .filter
   flex-shrink 0
   z-index 6910
-  &:first-child
-    border-bottom $border
-  &:last-child
-    border-top $border
 
 .visualization
-  flex 1
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
   z-index 6900
 </style>
