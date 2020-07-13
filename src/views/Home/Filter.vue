@@ -42,11 +42,16 @@ export default {
   },
   methods: {
     onOptionClicked(event, { active, name }) {
+      const inset =
+        parseInt(getComputedStyle(this.$refs.ul).getPropertyValue(
+          `--spacing-${window.innerWidth >= 480 ? 'lg' : 'md'}`
+        ), 10)
+
       if (!active) event.target.parentNode.parentNode.scrollTo({
         top: 0,
-        left: event.target.parentNode.offsetLeft + (this.isFlipped
-          ? -1 * (window.innerWidth - event.target.offsetWidth)
-          : 0),
+        left: event.target.parentNode.offsetLeft - (this.isFlipped
+          ? window.innerWidth - event.target.offsetWidth - inset
+          : inset),
         behavior: 'smooth'
       })
       if (this.type!=='select-multiple')
@@ -120,7 +125,7 @@ export default {
     font-size 16px
     line-height 20px
     font-weight bold
-    padding var(--spacing-sm) calc(var(--spacing-sm) + var(--spacing-xs))
+    padding var(--spacing-sm)
     @media (min-width 480px)
       font-size 20px
       line-height 24px
@@ -150,7 +155,7 @@ export default {
         content ' '
 
   span
-    padding var(--spacing-md)
+    padding calc(var(--spacing-sm) + var(--spacing-xs))
     max-width 320px
     position relative
     left 0

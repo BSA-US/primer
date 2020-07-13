@@ -19,7 +19,8 @@
           :x='linkMidpoint(l).x - 50'
           :y='linkMidpoint(l).y - 50'
         )
-          span.annotation(v-text='l.annotation')
+          body(xmlns='http://www.w3.org/1999/xhtml')
+            span.annotation(v-text='l.annotation')
     g.nodes
       template(v-for='n in graph.nodes' :key='n.id')
         g.node(:class='{ "matches-pillar": nodeMatchesPillar(n), "matches-step": nodeMatchesStep(n) }')
@@ -38,7 +39,8 @@
             :x='n.x - 50'
             :y='n.y - 50'
           )
-            span.annotation(v-text='n.name')
+            body(xmlns='http://www.w3.org/1999/xhtml')
+              span.annotation(v-text='n.name' width="100px" height="100px")
 </template>
 
 <script>
@@ -288,12 +290,13 @@ svg
     pointer-events none
     user-select none
 
+  body
+    display flex
+    justify-content center
+    align-items center
+
   .annotation
-    position fixed
-    top 50%
-    left 50%
     text-align center
-    transform translate(-50%, -50%)
     color var(--color-hint)
     /.matches-step &
       color var(--color)
@@ -312,6 +315,8 @@ svg
         font-weight bold
 
 @keyframes flow
+  from
+    stroke-dashoffset 0
   to
     stroke-dashoffset -100
 </style>
