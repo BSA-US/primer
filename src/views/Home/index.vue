@@ -1,33 +1,33 @@
 <template lang='pug'>
 main
-  Filter.filter(
+  Filter(
     :options='pillars'
     @option-activated='onPillarFilterOptionActivated'
     @option-deactivated='onPillarFilterOptionDeactivated'
   )
-  DualPowerProject.visualization(
+  Visualization(
     v-if='ready'
     :activePillar='activePillar'
     :activeStep='activeStep'
   )
-  Filter.filter(
+  Filter(
     type='linear'
     :options='steps'
     @option-activated='onStepFilterOptionActivated'
     @option-deactivated='onStepFilterOptionDeactivated'
   )
+  router-link(to='/about')
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapState } from 'vuex'
-import { Filter } from '@/components'
-import { DualPowerProject } from '@/components/visualizations'
+import { Filter, Visualization } from './'
 
 export default {
   name: 'Home',
   components: {
     Filter,
-    DualPowerProject
+    Visualization
   },
   data() {
     return {
@@ -39,14 +39,14 @@ export default {
     ...mapGetters('visualizations/dualPowerProject', ['links']),
     ...mapState('visualizations/dualPowerProject', {
       pillars({ pillars }) {
-        return pillars.map(({ color, id, name }) => ({
-          ...{ color, id, name },
+        return pillars.map(({ color, id, name, description }) => ({
+          ...{ color, id, name, description },
           active: this.activePillarFilterOptions.includes(name)
         }))
       },
       steps({ steps }) {
-        return steps.map(({ color, id, name }) => ({
-          ...{ color, id, name },
+        return steps.map(({ color, id, name, description }) => ({
+          ...{ color, id, name, description },
           active: this.activeStepFilterOptions.includes(name)
         }))
       },
@@ -87,24 +87,42 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
-$border = 1px solid black
-
 main
   display flex
   flex 1
   flex-direction column
+  justify-content space-between
   height 100%
   overflow hidden
 
 .filter
   flex-shrink 0
   z-index 6910
-  &:first-child
-    border-bottom $border
-  &:last-child
-    border-top $border
 
 .visualization
-  flex 1
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
   z-index 6900
+
+a
+  z-index 6920
+  display block
+  position fixed
+  bottom calc(20px + 3 * var(--spacing-md))
+  left var(--spacing-sm)
+  background-color var(--color-secondary)
+  mask url(https://unpkg.com/@mdi/svg@5.3.45/svg/information-outline.svg)
+  mask-size calc(var(--spacing-md) + var(--spacing-sm))
+  content ' '
+  width calc(var(--spacing-md) + var(--spacing-sm))
+  height @width
+  @media (min-width: 480px)
+    bottom calc(24px + 3 * var(--spacing-md))
+  @media (hover: hover)
+    &:hover
+      background-color var(--color)
+      left calc(var(--spacing-sm) + calc(var(--spacing-xs) / 2))
 </style>

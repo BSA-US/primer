@@ -1,7 +1,11 @@
 {
-  "name": "primer",
-  "version": "0.1.0",
+  "name": "Dual Power Project primer",
+  "version": "1.0.0-rc",
   "private": true,
+  "repository": "https://github.com/BSA-US/primer.git",
+  "contributors": [
+    "replygirl <moon@moon.fyi> (https://twitter.com/replygirI)"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
@@ -16,16 +20,16 @@
     "d3-zoom": "^1.8.3",
     "destyle.css": "^1.0.13",
     "unfetch": "^4.1.0",
-    "vue": "3.0.0-beta.15",
-    "vue-router": "4.0.0-alpha.12",
-    "vuex": "4.0.0-beta.2"
+    "vue": "^3.0.0-beta.15",
+    "vue-router": "^4.0.0-beta.1",
+    "vuex": "^4.0.0-beta.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-plugin-router": "~4.4.0",
     "@vue/cli-plugin-vuex": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
-    "@vue/compiler-sfc": "3.0.0-beta.15",
+    "@vue/compiler-sfc": "^3.0.0-beta.15",
     "pug": "^3.0.0",
     "pug-plain-loader": "^1.0.0",
     "stylus": "^0.54.7",

@@ -19,7 +19,8 @@
           :x='linkMidpoint(l).x - 50'
           :y='linkMidpoint(l).y - 50'
         )
-          span.annotation(v-text='l.annotation')
+          body(xmlns='http://www.w3.org/1999/xhtml')
+            span.annotation(v-text='l.annotation')
     g.nodes
       template(v-for='n in graph.nodes' :key='n.id')
         g.node(:class='{ "matches-pillar": nodeMatchesPillar(n), "matches-step": nodeMatchesStep(n) }')
@@ -38,7 +39,8 @@
             :x='n.x - 50'
             :y='n.y - 50'
           )
-            span.annotation(v-text='n.name')
+            body(xmlns='http://www.w3.org/1999/xhtml')
+              span.annotation(v-text='n.name' width="100px" height="100px")
 </template>
 
 <script>
@@ -62,14 +64,8 @@ const { mapGetters, mapState } =
 export default {
   name: 'VisualizationDualPowerProject',
   props: {
-    activePillar: {
-      validator: value =>
-        Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
-    },
-    activeStep: {
-      validator: value =>
-        Object.keys(k => ['active', 'color', 'id', 'name'].includes(k))
-    }
+    activePillar: Object,
+    activeStep: Object
   },
   data() {
     return {
@@ -133,7 +129,10 @@ export default {
   methods: {
     attachListeners() {
       window.addEventListener('resize', this.onResized)
-      select(`#${this.rootId}`).call(zoom().on('zoom', this.onZoomed))
+      select(`#${this.rootId}`).call(zoom()
+        .on('zoom', this.onZoomed)
+        .scaleExtent([0.1, 2])
+      )
     },
     detachListeners() {
       window.removeEventLister('resize', this.onResized)
@@ -213,7 +212,7 @@ export default {
       this.initSimulation()
     },
     onZoomed() {
-      this.renderer.scale = Math.max(0.1, Math.min(event.transform.k, 2))
+      this.renderer.scale = event.transform.k
     },
     relaxSimulation({ force = false } = {}) {
       if (!this.activeNodeDrags || force)
@@ -232,28 +231,21 @@ export default {
 </script>
 
 <style scoped lang='stylus'>
-$color-black-tint = rgba(0, 0, 0, 0.05)
-$color-black-shadow = rgba(0, 0, 0, 0.1)
-$color-black-hint = rgba(0, 0, 0, 0.25)
-$color-white-tint = rgba(255, 255, 255, 0.1)
-$color-white-shadow = rgba(255, 255, 255, 0.1)
-$color-white-hint = rgba(255, 255, 255, 0.25)
-
 stroke-width()
-  stroke-width 2px
+  stroke-width 1px
   &.matches-pillar
-    stroke-width 4px
+    stroke-width 2px
 
 text-color()
-  color $color-black-hint
+  color var(--color-hint)
   &.matches-step
-    color black
+    color var(--color)
 
 .visualization
   position relative
 
 svg
-  fill white
+  fill var(--background-color)
   width var(--width, 100%)
   height var(--height, 100%)
   position absolute
@@ -265,23 +257,23 @@ svg
   stroke-width()
   animation flow 2s linear infinite
   path
-    stroke $color-black-shadow
+    stroke var(--color-stroke)
     stroke-dasharray 10px
     ~/
       &.matches-pillar^[-1]
         animation-duration 1s
       &.matches-step^[-1]
-        stroke black
+        stroke var(--color)
 
 .node
   stroke-width()
   cursor grab
   circle
-    fill white
-    stroke white
+    fill var(--background-color)
+    stroke var(--background-color)
     r 60px
     &.foreground
-      stroke black
+      stroke var(--color)
       &:active
         cursor grabbing
       ~/
@@ -290,7 +282,7 @@ svg
         &:not(.matches-pillar)^[-1]
           @media(hover: hover)
             &:hover
-              fill $color-black-tint
+              fill var(--color-tint)
         &.matches-pillar^[-1]
           @media(hover: hover)
             &:hover
@@ -301,15 +293,16 @@ svg
     pointer-events none
     user-select none
 
+  body
+    display flex
+    justify-content center
+    align-items center
+
   .annotation
-    position fixed
-    top 50%
-    left 50%
     text-align center
-    transform translate(-50%, -50%)
-    color $color-black-hint
+    color var(--color-hint)
     /.matches-step &
-      color initial
+      color var(--color)
     /.link
       & ^[-1]
         font-size 12px
@@ -325,6 +318,8 @@ svg
         font-weight bold
 
 @keyframes flow
+  from
+    stroke-dashoffset 0
   to
     stroke-dashoffset -100
 </style>
