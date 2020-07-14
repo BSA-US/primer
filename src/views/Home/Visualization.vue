@@ -129,7 +129,10 @@ export default {
   methods: {
     attachListeners() {
       window.addEventListener('resize', this.onResized)
-      select(`#${this.rootId}`).call(zoom().on('zoom', this.onZoomed))
+      select(`#${this.rootId}`).call(zoom()
+        .on('zoom', this.onZoomed)
+        .scaleExtent([0.1, 2])
+      )
     },
     detachListeners() {
       window.removeEventLister('resize', this.onResized)
@@ -209,7 +212,7 @@ export default {
       this.initSimulation()
     },
     onZoomed() {
-      this.renderer.scale = Math.max(0.1, Math.min(event.transform.k, 2))
+      this.renderer.scale = event.transform.k
     },
     relaxSimulation({ force = false } = {}) {
       if (!this.activeNodeDrags || force)
