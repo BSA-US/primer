@@ -2,6 +2,10 @@
   "name": "Dual Power Project primer",
   "version": "1.0.0-rc",
   "private": true,
+  "repository": "https://github.com/BSA-US/primer.git",
+  "contributors": [
+    "replygirl <moon@moon.fyi> (https://twitter.com/replygirI)"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
