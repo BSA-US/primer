@@ -4,7 +4,8 @@
   "private": true,
   "repository": "https://github.com/BSA-US/primer.git",
   "contributors": [
-    "replygirl <moon@moon.fyi> (https://twitter.com/replygirI)"
+    "replygirl <moon@moon.fyi> (https://twitter.com/replygirI)",
+    "stanleepark <aarin.smith@gmail.com>"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
