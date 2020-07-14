@@ -1,6 +1,6 @@
 {
-  "name": "primer",
-  "version": "0.1.0",
+  "name": "Dual Power Project primer",
+  "version": "1.0.0-rc",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
