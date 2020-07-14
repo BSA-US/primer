@@ -60,14 +60,16 @@ export default {
       this.$emit(`option-${active ? 'de' : ''}activated`, name)
     },
     onResized() {
-      const endItemWidth =
-        this.$refs[this.isFlipped ? 'first' : 'last'].offsetWidth
-      const padding =
-        parseInt(getComputedStyle(this.$refs.ul).getPropertyValue(
-          `padding-${this.isFlipped ? 'right' : 'left'}`
-        ), 10)
+      if (this.$refs.first && this.$refs.last) {
+        const endItemWidth =
+          this.$refs[this.isFlipped ? 'first' : 'last'].offsetWidth
+        const padding =
+          parseInt(getComputedStyle(this.$refs.ul).getPropertyValue(
+            `padding-${this.isFlipped ? 'right' : 'left'}`
+          ), 10)
 
-      this.endPadding = `${window.innerWidth - (endItemWidth + padding)}px`
+        this.endPadding = `${window.innerWidth - (endItemWidth + padding)}px`
+      }
     }
   }
 }
