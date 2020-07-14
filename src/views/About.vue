@@ -3,14 +3,16 @@ mixin circles
   .circles: .circle(v-for="n in 4")
 
 header
-  span <router-link to="/">This</router-link> is a map of a functioning Solidarity Economy.
+  span <router-link class="thick" to="/">This</router-link> is an overview of bodies in a <a href="https://dualpower.app/">Dual Power Project</a>.
 main
   div
     +circles
-    span These are pillars of the <a href="">Dual Power</a> strategy
-  span These are institutions in a <a href="">Solidarity Economy</a>
+    span These are pillars of Dual Power
+  div.outline
+    +circles
+    span These are institutions & actions
   div
-    span These are different milestones in a <a href="">Dual Power Project</a>'s development. They aren't meant to be prescriptive
+    span These are potential milestones in a Dual Power Project's development. Every project will develop differently
     +circles
 footer
   span <a href="https://twitter.com/BlackSocialists">Follow @BlackSocialists</a> for more info
@@ -34,13 +36,15 @@ footer
     @media (min-width 480px)
       margin-top var(--spacing-xl)
       font-size 40px
-      line-height 40px
-    a
-      font-family var(--font-family-header)
-      font-weight bold
+      line-height 42px
+
+  .thick
+    font-family var(--font-family-header)
+    font-weight bold
 
   main
     flex 1
+    max-height 640px
     border 1px solid var(--color)
     display flex
     flex-direction column
@@ -51,6 +55,8 @@ footer
     & > *
       display flex
       flex-direction column
+      align-items center
+      text-align center
       max-width 240px
       &:not(:last-child)
         margin-bottom var(--spacing-lg)
@@ -58,6 +64,8 @@ footer
         margin-bottom var(--spacing-sm)
       &:first-child
         align-self flex-start
+        align-items flex-start
+        text-align left
       &:last-child
         align-self flex-end
         align-items flex-end
@@ -82,11 +90,14 @@ footer
   .circle
     display block
     width var(--spacing-sm)
-    height var(--spacing-sm)
+    height @width
     background-color var(--color)
     mask url(https://unpkg.com/@mdi/svg@5.3.45/svg/circle.svg)
-    mask-size var(--spacing-sm)
+    mask-size contain
     content ' '
+    /.outline &
+      mask url(https://unpkg.com/@mdi/svg@5.3.45/svg/circle-outline.svg)
+      mask-size contain
     &:not(:last-child)
       margin-right var(--spacing-sm)
 </style>
