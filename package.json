@@ -31,7 +31,7 @@
     "@vue/cli-plugin-vuex": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
     "@vue/compiler-sfc": "^3.0.0-beta.15",
-    "pug": "^3.0.0",
+    "pug": "^3.0.1",
     "pug-plain-loader": "^1.0.0",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
